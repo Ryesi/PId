@@ -12,8 +12,12 @@ i2c = SoftI2C(scl=Pin(22), sda=Pin(21), freq=10000)  # initializing the I2C meth
 lcd = I2cLcd(i2c, I2C_ADDR, totalRows, totalColumns)
 
 # Define pins
-trigger_pin = Pin(5, Pin.OUT)
-echo_pin = Pin(18, Pin.IN)
+trigger_pin1 = Pin(5, Pin.OUT)
+echo_pin1 = Pin(18, Pin.IN)
+
+trigger_pin2 = Pin(12, Pin.OUT)
+echo_pin2 = Pin(14, Pin.IN)
+
 servo_pin = Pin(13, Pin.OUT)
 
 # Initialize PWM for servo
@@ -21,7 +25,7 @@ pwm = PWM(servo_pin)
 pwm.freq(50)
 
 # PID constants
-TARGET_DISTANCE = 15.0  # Example target in cm
+#TARGET_DISTANCE = 20.0  # Example target in cm
 # Kp = 0.3  # Proportional gain (tune this value)
 # Ki = 0.1  # Integral gain (tune this value)
 # Kd = 0.05  # Derivative gain (tune this value)
@@ -51,7 +55,7 @@ def map_pot(x, in_min, in_max, out_min, out_max):
 def servo_angle(angle):
     pwm.duty(map_value(angle, 0, 180, 20, 120))
 
-def get_distance():
+def get_distance(trigger_pin,echo_pin):
     # Send a 10us pulse to trigger the ultrasonic module
     trigger_pin.off()
     time.sleep_us(2)
@@ -116,8 +120,10 @@ last_time = time.ticks_ms()
 
 while True:
     # Get the current distance from the ultrasonic sensor
-    current_distance = get_distance()
+    current_distance = get_distance(trigger_pin1,echo_pin1)
+    TARGET_DISTANCE = get_distance(trigger_pin2,echo_pin2)
     
+    print("Target: ",TARGET_DISTANCE,"Current: ",current_distance )
     # Calculate time difference in seconds
     current_time = time.ticks_ms()
     dt = time.ticks_diff(current_time, last_time) / 1000.0
@@ -142,7 +148,7 @@ while True:
     servo_angle(angle)
     
     # Print the distance and the servo angle for monitoring
-    print(f"Distance: {current_distance:.2f} cm, Servo Angle: {angle:.2f}")
+    #print(f"Distance: {current_distance:.2f} cm, Servo Angle: {angle:.2f}")
     
     # Small delay to allow the system to stabilize
     time.sleep(0.1)
