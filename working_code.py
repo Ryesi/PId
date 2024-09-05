@@ -63,11 +63,15 @@ def get_distance(trigger_pin,echo_pin):
 def pid_controller(target, current, dt):
     global integral_error, last_error
     
-    print(Kp,Ki,Kd)
-    print(current_distance,TARGET_DISTANCE)
+    
+    #print(Kp,Ki,Kd)
+    #print(current_distance,TARGET_DISTANCE)
     # Calculate the error
     error = target - current
     
+    transfer= error +TARGET_DISTANCE
+    print("Kp:",Kp,"Ki:",Ki,"Kd:",Kd,"Target:",target,"transfer:",transfer)
+    #print(TARGET_DISTANCE)  
     # Accumulate the integral error
     integral_error += error * dt
     
@@ -108,7 +112,7 @@ while True:
     Kp = round(Kp, 1)
 
     Ki_value = Ki_read.read()
-    Ki= map_pot(Ki_value, 0, 4095, 0, 0.5)
+    Ki= map_pot(Ki_value, 0, 4095, 0, 0.3)
     Ki = round(Ki, 1)
 
     Kd_value = Kd_read.read()
