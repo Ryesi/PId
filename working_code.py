@@ -20,6 +20,9 @@ pwm.freq(50)
 # Ki = 0.1  # Integral gain (tune this value)
 # Kd = 0.05  # Derivative gain (tune this value)
 
+target = ADC(Pin(33))
+target.atten(ADC.ATTN_11DB)       #Full range: 3.3v
+
 Kp_read = ADC(Pin(32))
 Kp_read.atten(ADC.ATTN_11DB)       #Full range: 3.3v
 
@@ -91,7 +94,10 @@ while True:
     
     current_distance = round(get_distance(trigger_pin1,echo_pin1),0)
     
-    TARGET_DISTANCE=20
+    target_value = target.read()
+    TARGET_DISTANCE= map_pot(target_value, 0, 4095, 5, 23)
+    TARGET_DISTANCE = round(TARGET_DISTANCE, 0)
+    
     # Calculate time difference in seconds
     current_time = time.ticks_ms()
     dt = time.ticks_diff(current_time, last_time) / 1000.0
@@ -120,5 +126,8 @@ while True:
     
     # Small delay to allow the system to stabilize
     time.sleep(0.1)
+
+
+
 
 
